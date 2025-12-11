@@ -11,6 +11,7 @@ import 'package:water_readings_app/features/dashboard/dashboard_screen.dart';
 import 'package:water_readings_app/features/readings/readings_overview_screen.dart';
 import 'package:water_readings_app/features/readings/readings_list_screen.dart';
 import 'package:water_readings_app/features/readings/camera_reading_screen.dart';
+import 'package:water_readings_app/features/users/users_list_screen.dart';
 import 'package:water_readings_app/shared/constants/app_theme.dart';
 
 void main() {
@@ -150,6 +151,13 @@ class _AquaFlowAppState extends ConsumerState<AquaFlowApp> {
               unitId: unitId,
               periodId: periodId,
             );
+          },
+        ),
+        GoRoute(
+          path: '/condominium/:id/users',
+          builder: (context, state) {
+            final condominiumId = state.pathParameters['id']!;
+            return UsersListScreen(condominiumId: condominiumId);
           },
         ),
       ],

@@ -2,9 +2,10 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:water_readings_app/core/services/secure_storage_service.dart';
+import 'package:water_readings_app/core/config/environment.dart';
 
 class ApiService {
-  static const String baseUrl = 'http://10.0.2.2:3000/api';
+  static String get baseUrl => Environment.apiBaseUrl;
   
   late final Dio _dio;
   final SecureStorageService _secureStorage;
@@ -61,16 +62,21 @@ class ApiService {
     ));
 
     // Logging interceptor (disabled for production)
+    // Uncomment for debugging API requests
     // _dio.interceptors.add(LogInterceptor(
     //   requestBody: true,
     //   responseBody: true,
+    //   requestHeader: true,
+    //   responseHeader: false,
+    //   error: true,
+    //   logPrint: (obj) => print('[API] $obj'),
     // ));
   }
 
   Future<bool> _isConnected() async {
     final connectivityResult = await Connectivity().checkConnectivity();
-    return connectivityResult == ConnectivityResult.mobile || 
-           connectivityResult == ConnectivityResult.wifi;
+    return connectivityResult.contains(ConnectivityResult.mobile) ||
+           connectivityResult.contains(ConnectivityResult.wifi);
   }
 
   Future<void> _refreshToken() async {
@@ -109,8 +115,11 @@ class ApiService {
     if (!await _isConnected()) {
       throw const ConnectionException('No internet connection');
     }
-    
-    final response = await _dio.get('/condominiums');
+
+    // Request condominiums with nested blocks and units data
+    final response = await _dio.get('/condominiums', queryParameters: {
+      'include': 'blocks,units',
+    });
     return response.data['condominiums'] ?? response.data;
   }
 
@@ -435,16 +444,52 @@ class ApiService {
     if (!await _isConnected()) {
       throw const ConnectionException('No internet connection');
     }
-    
+
     final response = await _dio.delete('/periods/$periodId/calculations');
     return response.data;
+  }
+
+  // Users management endpoints
+  Future<List<dynamic>> getCondominiumUsers(String condominiumId) async {
+    if (!await _isConnected()) {
+      throw const ConnectionException('No internet connection');
+    }
+
+    final response = await _dio.get('/condominiums/$condominiumId/users');
+    return response.data;
+  }
+
+  Future<Map<String, dynamic>> createCondominiumUser(String condominiumId, Map<String, dynamic> data) async {
+    if (!await _isConnected()) {
+      throw const ConnectionException('No internet connection');
+    }
+
+    final response = await _dio.post('/condominiums/$condominiumId/users', data: data);
+    return response.data;
+  }
+
+  Future<Map<String, dynamic>> updateCondominiumUser(String condominiumId, String userId, Map<String, dynamic> data) async {
+    if (!await _isConnected()) {
+      throw const ConnectionException('No internet connection');
+    }
+
+    final response = await _dio.put('/condominiums/$condominiumId/users/$userId', data: data);
+    return response.data;
+  }
+
+  Future<void> deleteCondominiumUser(String condominiumId, String userId) async {
+    if (!await _isConnected()) {
+      throw const ConnectionException('No internet connection');
+    }
+
+    await _dio.delete('/condominiums/$condominiumId/users/$userId');
   }
 }
 
 class ConnectionException implements Exception {
   final String message;
   const ConnectionException(this.message);
-  
+
   @override
   String toString() => 'ConnectionException: $message';
 }

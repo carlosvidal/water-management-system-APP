@@ -71,7 +71,7 @@ final condominiumDetailDataProvider = Provider.family<Condominium?, String>((ref
   return ref.watch(condominiumDetailProvider(condominiumId)).when(
     data: (condominium) => condominium,
     loading: () => null,
-    error: (_, __) => null,
+    error: (_, _) => null,
   );
 });
 

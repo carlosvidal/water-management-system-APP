@@ -1,19 +1,32 @@
 {
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "name": "flutter: Run on Android Emulator",
-            "type": "dart",
-            "request": "launch",
-            "program": "lib/main.dart",
-            "deviceId": "emulator-5554",
-            "flutterMode": "debug"
-        },
-        {
-            "name": "flutter: Run (Debug)",
-            "type": "dart",
-            "request": "launch",
-            "program": "lib/main.dart"
-        }
-    ]
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Development",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "args": [
+        "--dart-define=ENVIRONMENT=development"
+      ]
+    },
+    {
+      "name": "Production",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "args": [
+        "--dart-define=ENVIRONMENT=production"
+      ]
+    },
+    {
+      "name": "Staging",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "args": [
+        "--dart-define=ENVIRONMENT=staging"
+      ]
+    }
+  ]
 }

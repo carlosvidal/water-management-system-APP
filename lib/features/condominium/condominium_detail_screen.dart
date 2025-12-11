@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:water_readings_app/core/providers/condominium_detail_provider.dart';
-import 'package:water_readings_app/core/models/condominium.dart';
+import 'package:water_readings_app/core/models/condominium.dart' as models;
 import 'package:water_readings_app/features/condominium/unit_detail_screen.dart';
 
 class CondominiumDetailScreen extends ConsumerWidget {
@@ -65,7 +65,7 @@ class CondominiumDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildCondominiumDetail(BuildContext context, WidgetRef ref, Condominium condominium) {
+  Widget _buildCondominiumDetail(BuildContext context, WidgetRef ref, models.Condominium condominium) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -140,7 +140,7 @@ class CondominiumDetailScreen extends ConsumerWidget {
     );
   }
 
-  bool _shouldShowAddButton(Condominium condominium) {
+  bool _shouldShowAddButton(models.Condominium condominium) {
     if (condominium.totalUnitsPlanned == null || condominium.blocks == null) {
       return true; // Show if no limit is set
     }
@@ -153,7 +153,7 @@ class CondominiumDetailScreen extends ConsumerWidget {
     return totalCapacity < condominium.totalUnitsPlanned!;
   }
 
-  bool _shouldShowAddUnitButton(Block block) {
+  bool _shouldShowAddUnitButton(models.Block block) {
     if (block.maxUnits == null) {
       return true; // Show if no limit is set for the block
     }
@@ -162,7 +162,7 @@ class CondominiumDetailScreen extends ConsumerWidget {
     return currentUnits < block.maxUnits!;
   }
 
-  String _buildBlockSubtitle(Block block) {
+  String _buildBlockSubtitle(models.Block block) {
     final currentUnits = block.units?.length ?? 0;
     if (block.maxUnits == null) {
       return '$currentUnits unidades';
@@ -195,7 +195,7 @@ class CondominiumDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildSummaryInfo(Condominium condominium) {
+  Widget _buildSummaryInfo(models.Condominium condominium) {
     final totalBlocks = condominium.blocks?.length ?? 0;
     final totalUnits = condominium.blocks?.fold<int>(
       0, 
@@ -209,7 +209,7 @@ class CondominiumDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildStatusBadge(Condominium condominium) {
+  Widget _buildStatusBadge(models.Condominium condominium) {
     final totalUnits = condominium.blocks?.fold<int>(
       0, 
       (sum, block) => sum + (block.units?.length ?? 0),
@@ -301,15 +301,15 @@ class CondominiumDetailScreen extends ConsumerWidget {
     );
   }
 
-  List<Widget> _buildBlocksList(BuildContext context, WidgetRef ref, List<Block> blocks) {
+  List<Widget> _buildBlocksList(BuildContext context, WidgetRef ref, List<models.Block> blocks) {
     // Sort blocks alphabetically
-    final sortedBlocks = List<Block>.from(blocks)
+    final sortedBlocks = List<models.Block>.from(blocks)
       ..sort((a, b) => a.name.compareTo(b.name));
     
     // Auto-expand if there's only one block
     final shouldAutoExpand = blocks.length == 1;
       
-    return sortedBlocks.map((block) => Card(
+    return sortedBlocks.map<Widget>((models.Block block) => Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: ExpansionTile(
         initiallyExpanded: shouldAutoExpand,
@@ -565,7 +565,7 @@ class CondominiumDetailScreen extends ConsumerWidget {
     );
   }
 
-  void _showCreateUnitDialog(BuildContext context, WidgetRef ref, Block block) {
+  void _showCreateUnitDialog(BuildContext context, WidgetRef ref, models.Block block) {
     final nameController = TextEditingController();
 
     showDialog(
@@ -619,7 +619,7 @@ class CondominiumDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildUnitSubtitle(Unit unit) {
+  Widget _buildUnitSubtitle(models.Unit unit) {
     // Only check for the main resident (one per unit)
     if (unit.residentId != null && unit.resident != null) {
       return Text('Residente: ${unit.resident!.name}');
@@ -628,7 +628,7 @@ class CondominiumDetailScreen extends ConsumerWidget {
     }
   }
 
-  void _navigateToUnitDetail(BuildContext context, WidgetRef ref, Unit unit) {
+  void _navigateToUnitDetail(BuildContext context, WidgetRef ref, models.Unit unit) {
     final condominium = ref.read(condominiumDetailDataProvider(condominiumId));
     Navigator.of(context).push(
       MaterialPageRoute(

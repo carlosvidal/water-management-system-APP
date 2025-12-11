@@ -145,7 +145,7 @@ final residentsListProvider = Provider.family<List<Resident>, String>((ref, cond
   return ref.watch(residentsProvider(condominiumId)).when(
     data: (residents) => residents,
     loading: () => [],
-    error: (_, __) => [],
+    error: (_, _) => [],
   );
 });
 

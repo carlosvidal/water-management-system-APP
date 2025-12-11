@@ -16,17 +16,35 @@ class CondominiumNotifier extends StateNotifier<AsyncValue<List<Condominium>>> {
     try {
       state = const AsyncValue.loading();
       final condominiumsData = await _apiService.getCondominiums();
-      final condominiums = condominiumsData
-          .map((data) => Condominium.fromJson(data))
-          .toList();
+
+      // Check if the first condominium has blocks data or just _count
+      final needsDetailedFetch = condominiumsData.isNotEmpty &&
+          (condominiumsData.first is Map) &&
+          (condominiumsData.first as Map)['blocks'] == null &&
+          (condominiumsData.first as Map)['_count'] != null;
+
+      List<Condominium> condominiums;
+
+      if (needsDetailedFetch) {
+        // Fetch complete data for each condominium
+        final detailedData = await Future.wait(
+          condominiumsData.map((data) => _apiService.getCondominium(data['id'] as String))
+        );
+        condominiums = detailedData.map((data) => Condominium.fromJson(data)).toList();
+      } else {
+        condominiums = condominiumsData
+            .map((data) => Condominium.fromJson(data as Map<String, dynamic>))
+            .toList();
+      }
+
       state = AsyncValue.data(condominiums);
     } catch (e, stackTrace) {
       // Error loading condominiums
-      
+
       // Check if it's an authentication error
       if (e is DioException) {
-        if (e.response?.statusCode == 401 || 
-            (e.response?.statusCode == 500 && 
+        if (e.response?.statusCode == 401 ||
+            (e.response?.statusCode == 500 &&
              e.response?.data?['details']?['stack']?.contains('Invalid access token') == true)) {
           // Authentication error detected, logging out user
           // Force logout on authentication errors
@@ -34,7 +52,7 @@ class CondominiumNotifier extends StateNotifier<AsyncValue<List<Condominium>>> {
           return;
         }
       }
-      
+
       state = AsyncValue.error(e, stackTrace);
     }
   }
@@ -77,7 +95,7 @@ final condominiumListProvider = Provider<List<Condominium>>((ref) {
   return ref.watch(condominiumProvider).when(
     data: (condominiums) => condominiums,
     loading: () => [],
-    error: (_, __) => [],
+    error: (_, _) => [],
   );
 });
 

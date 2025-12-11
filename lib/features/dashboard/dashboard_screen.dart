@@ -136,16 +136,18 @@ class DashboardScreen extends ConsumerWidget {
   Widget _buildStatistics(BuildContext context, List condominiums) {
     final totalCondominiums = condominiums.length;
     final totalBlocks = condominiums.fold<int>(
-      0, 
+      0,
       (sum, condo) => sum + ((condo.blocks?.length ?? 0) as int),
     );
-    final totalUnits = condominiums.fold<int>(
-      0, 
-      (sum, condo) => sum + ((condo.blocks?.fold<int>(
-        0, 
-        (blockSum, block) => blockSum + ((block.units?.length ?? 0) as int),
-      ) ?? 0) as int),
-    );
+
+    int totalUnits = 0;
+    for (var condo in condominiums) {
+      if (condo.blocks != null) {
+        for (var block in condo.blocks) {
+          totalUnits += (block.units?.length ?? 0) as int;
+        }
+      }
+    }
 
     return Row(
       children: [

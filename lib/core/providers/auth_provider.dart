@@ -57,7 +57,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
   Future<void> login(String email, String password) async {
     try {
       state = const AuthState.loading();
-      
+
       // Demo login disabled - using real backend API
       // if (email == 'demo@aquaflow.com' && password == 'demo123') {
       //   final demoUser = User(
@@ -67,14 +67,14 @@ class AuthNotifier extends StateNotifier<AuthState> {
       //     role: 'ADMIN',
       //     isActive: true,
       //   );
-      //   
+      //
       //   const demoToken = 'demo-token-123';
-      //   
+      //
       //   // Store credentials securely
       //   await _secureStorage.storeToken(demoToken);
       //   await _secureStorage.storeUserData(jsonEncode(demoUser.toJson()));
       //   await _secureStorage.storeLastEmail(email);
-      //   
+      //
       //   state = AuthState.authenticated(
       //     user: demoUser,
       //     token: demoToken,
@@ -82,41 +82,44 @@ class AuthNotifier extends StateNotifier<AuthState> {
       //   );
       //   return;
       // }
-      
+
       // Try real API login
       final response = await _apiService.login(email, password);
-      
+
       final user = User.fromJson(response['user']);
       final token = response['accessToken'];
       final refreshToken = response['refreshToken'];
-      
+
       // Store credentials securely
       await _secureStorage.storeToken(token);
       await _secureStorage.storeUserData(jsonEncode(user.toJson()));
-      
+
       if (refreshToken != null) {
         await _secureStorage.storeRefreshToken(refreshToken);
       }
-      
+
       // Store last used email for convenience
       await _secureStorage.storeLastEmail(email);
-      
+
       state = AuthState.authenticated(
         user: user,
         token: token,
         refreshToken: refreshToken,
       );
-    } catch (e) {
+    } catch (e, _) {
       String errorMessage = 'Login failed';
-      
+
       if (e.toString().contains('401') || e.toString().contains('Unauthorized')) {
         errorMessage = 'Invalid email or password';
       } else if (e.toString().contains('ConnectionException')) {
         errorMessage = 'No internet connection. Please check your network.';
       } else if (e.toString().contains('timeout')) {
         errorMessage = 'Connection timeout. Please try again.';
+      } else {
+        // Include actual error for debugging
+        errorMessage = 'Login failed: ${e.toString()}';
       }
-      
+
       state = AuthState.error(errorMessage);
     }
   }

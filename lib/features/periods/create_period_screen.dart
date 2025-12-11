@@ -28,7 +28,7 @@ class _CreatePeriodScreenState extends ConsumerState<CreatePeriodScreen> {
       return periodsAsync.when(
         data: (periods) => periods.isEmpty,
         loading: () => false,
-        error: (_, __) => false,
+        error: (_, _) => false,
       );
     } catch (e) {
       return false;

@@ -144,10 +144,11 @@ class ReadingsOverviewScreen extends ConsumerWidget {
 
   int _getTotalUnits(dynamic condominium) {
     if (condominium.blocks == null) return 0;
-    return condominium.blocks.fold<int>(
-      0, 
-      (sum, block) => sum + (block.units?.length ?? 0),
-    );
+    int total = 0;
+    for (var block in condominium.blocks) {
+      total += (block.units?.length ?? 0) as int;
+    }
+    return total;
   }
 
   int _getTotalBlocks(List condominiums) {

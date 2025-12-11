@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:water_readings_app/core/providers/auth_provider.dart';
+import 'package:water_readings_app/core/services/api_service.dart';
 
 class MainLayout extends ConsumerStatefulWidget {
   final Widget child;
@@ -140,10 +141,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
               title: const Text('Usuarios'),
               onTap: () {
                 Navigator.pop(context);
-                // TODO: Navigate to users management
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Gestión de usuarios - Próximamente')),
-                );
+                _showCondominiumSelectorForUsers(context, ref);
               },
             ),
             const Divider(),
@@ -193,6 +191,74 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
         const Text('Desarrollado con Flutter y tecnologías modernas.'),
       ],
     );
+  }
+
+  void _showCondominiumSelectorForUsers(BuildContext context, WidgetRef ref) async {
+    try {
+      final apiService = ref.read(apiServiceProvider);
+      final condominiums = await apiService.getCondominiums();
+
+      if (!context.mounted) return;
+
+      if (condominiums.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('No hay condominios disponibles'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+        return;
+      }
+
+      // If only one condominium, navigate directly
+      if (condominiums.length == 1) {
+        context.go('/condominium/${condominiums[0]['id']}/users');
+        return;
+      }
+
+      // Show dialog to select condominium
+      final selectedCondominium = await showDialog<Map<String, dynamic>>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Seleccionar Condominio'),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: condominiums.length,
+              itemBuilder: (context, index) {
+                final condo = condominiums[index];
+                return ListTile(
+                  leading: const Icon(Icons.apartment),
+                  title: Text(condo['name'] ?? 'Sin nombre'),
+                  subtitle: Text(condo['address'] ?? ''),
+                  onTap: () => Navigator.pop(context, condo),
+                );
+              },
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancelar'),
+            ),
+          ],
+        ),
+      );
+
+      if (selectedCondominium != null && context.mounted) {
+        context.go('/condominium/${selectedCondominium['id']}/users');
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error al cargar condominios: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   void _showLogoutDialog(BuildContext context, WidgetRef ref) {
