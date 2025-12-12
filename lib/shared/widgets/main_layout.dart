@@ -52,27 +52,29 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
       drawer: _buildDrawer(context, ref, user),
       body: widget.child,
       floatingActionButton: widget.floatingActionButton,
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: widget.currentIndex,
-        onDestinationSelected: _onDestinationSelected,
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.dashboard),
-            selectedIcon: Icon(Icons.dashboard),
-            label: 'Dashboard',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.apartment),
-            selectedIcon: Icon(Icons.apartment),
-            label: 'Condominios',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.analytics),
-            selectedIcon: Icon(Icons.analytics),
-            label: 'Lecturas',
-          ),
-        ],
-      ),
+      bottomNavigationBar: widget.currentIndex >= 0
+          ? NavigationBar(
+              selectedIndex: widget.currentIndex,
+              onDestinationSelected: _onDestinationSelected,
+              destinations: const [
+                NavigationDestination(
+                  icon: Icon(Icons.dashboard),
+                  selectedIcon: Icon(Icons.dashboard),
+                  label: 'Dashboard',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.apartment),
+                  selectedIcon: Icon(Icons.apartment),
+                  label: 'Condominios',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.analytics),
+                  selectedIcon: Icon(Icons.analytics),
+                  label: 'Lecturas',
+                ),
+              ],
+            )
+          : null,
     );
   }
 
