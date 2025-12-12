@@ -15,6 +15,7 @@ class DashboardScreen extends ConsumerWidget {
 
     return MainLayout(
       currentIndex: 0,
+      title: 'Dashboard',
       child: RefreshIndicator(
         onRefresh: () => ref.read(condominiumProvider.notifier).refreshCondominiums(),
         child: SingleChildScrollView(

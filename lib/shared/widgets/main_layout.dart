@@ -8,12 +8,14 @@ class MainLayout extends ConsumerStatefulWidget {
   final Widget child;
   final int currentIndex;
   final Widget? floatingActionButton;
+  final String? title;
 
   const MainLayout({
     super.key,
     required this.child,
     required this.currentIndex,
     this.floatingActionButton,
+    this.title,
   });
 
   @override
@@ -41,7 +43,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('AquaFlow'),
+        title: Text(widget.title ?? 'AquaFlow'),
         leading: Builder(
           builder: (context) => IconButton(
             icon: const Icon(Icons.menu),

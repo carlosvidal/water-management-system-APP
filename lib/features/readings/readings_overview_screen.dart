@@ -12,13 +12,13 @@ class ReadingsOverviewScreen extends ConsumerStatefulWidget {
   ConsumerState<ReadingsOverviewScreen> createState() => _ReadingsOverviewScreenState();
 }
 
-class _ReadingsOverviewScreenState extends ConsumerState<ReadingsOverviewScreen> {
+class _ReadingsOverviewScreenState extends ConsumerState<ReadingsOverviewScreen> with RouteAware {
   bool _hasNavigated = false;
 
   @override
-  void initState() {
-    super.initState();
-    // Reset navigation flag when screen is initialized
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Reset navigation flag when coming back to this screen
     _hasNavigated = false;
   }
 
@@ -28,6 +28,7 @@ class _ReadingsOverviewScreenState extends ConsumerState<ReadingsOverviewScreen>
 
     return MainLayout(
       currentIndex: 2,
+      title: 'Lecturas',
       child: RefreshIndicator(
         onRefresh: () => ref.read(condominiumProvider.notifier).refreshCondominiums(),
         child: condominiumsAsync.when(

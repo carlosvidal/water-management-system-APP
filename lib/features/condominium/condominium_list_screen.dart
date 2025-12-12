@@ -14,6 +14,7 @@ class CondominiumListScreen extends ConsumerWidget {
 
     return MainLayout(
       currentIndex: 1,
+      title: 'Condominios',
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showCreateCondominiumDialog(context, ref),
         child: const Icon(Icons.add),
