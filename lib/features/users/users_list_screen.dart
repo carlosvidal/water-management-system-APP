@@ -117,7 +117,7 @@ class _UsersListScreenState extends ConsumerState<UsersListScreen> {
         title: const Text('Gestión de Usuarios'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
+          onPressed: () => context.go('/dashboard'),
         ),
       ),
       body: RefreshIndicator(
