@@ -5,11 +5,25 @@ import 'package:water_readings_app/core/providers/condominium_provider.dart';
 import 'package:water_readings_app/features/periods/periods_list_screen.dart';
 import 'package:water_readings_app/shared/widgets/main_layout.dart';
 
-class ReadingsOverviewScreen extends ConsumerWidget {
+class ReadingsOverviewScreen extends ConsumerStatefulWidget {
   const ReadingsOverviewScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ReadingsOverviewScreen> createState() => _ReadingsOverviewScreenState();
+}
+
+class _ReadingsOverviewScreenState extends ConsumerState<ReadingsOverviewScreen> {
+  bool _hasNavigated = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Reset navigation flag when screen is initialized
+    _hasNavigated = false;
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final condominiumsAsync = ref.watch(condominiumProvider);
 
     return MainLayout(
@@ -34,19 +48,26 @@ class ReadingsOverviewScreen extends ConsumerWidget {
     if (condominiums.length == 1) {
       final condominium = condominiums.first;
       final totalUnits = _getTotalUnits(condominium);
-      
+
       // Check if condominium is ready (has units)
       if (totalUnits == 0) {
         return _buildCondominiumNotReadyState(context, condominium);
       }
-      
-      // Navigate directly to the single condominium's periods
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _navigateToCondominiumPeriods(context, condominium);
-      });
-      
-      // Show loading while navigating
-      return const Center(child: CircularProgressIndicator());
+
+      // Navigate directly to the single condominium's periods (only once)
+      if (!_hasNavigated) {
+        _hasNavigated = true;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _navigateToCondominiumPeriods(context, condominium);
+        });
+
+        // Show loading while navigating
+        return const Center(child: CircularProgressIndicator());
+      }
+
+      // If we've already navigated, show the selection screen
+      // This prevents infinite navigation loop when user presses back
+      return _buildSingleCondominiumView(context, condominium);
     }
 
     // Show list if user has multiple condominiums
@@ -243,6 +264,94 @@ class ReadingsOverviewScreen extends ConsumerWidget {
           condominiumId: condominium.id,
           condominium: condominium,
         ),
+      ),
+    );
+  }
+
+  Widget _buildSingleCondominiumView(BuildContext context, dynamic condominium) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header
+          Text(
+            'Gestión de Lecturas',
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Tu condominio',
+            style: TextStyle(
+              color: Colors.grey[600],
+            ),
+          ),
+
+          const SizedBox(height: 24),
+
+          // Single Condominium Card
+          Card(
+            margin: const EdgeInsets.only(bottom: 12),
+            child: ListTile(
+              leading: CircleAvatar(
+                backgroundColor: Theme.of(context).primaryColor,
+                child: Text(
+                  condominium.name.substring(0, 1).toUpperCase(),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              title: Text(
+                condominium.name,
+                style: const TextStyle(fontWeight: FontWeight.w600),
+              ),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(condominium.address),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Icon(Icons.domain, size: 14, color: Colors.grey[600]),
+                      const SizedBox(width: 4),
+                      Text(
+                        '${condominium.blocks?.length ?? 0} bloques',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Icon(Icons.home, size: 14, color: Colors.grey[600]),
+                      const SizedBox(width: 4),
+                      Text(
+                        '${_getTotalUnits(condominium)} unidades',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              trailing: const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.analytics, color: Colors.blue),
+                  SizedBox(width: 4),
+                  Icon(Icons.arrow_forward_ios, size: 16),
+                ],
+              ),
+              onTap: () => _navigateToCondominiumPeriods(context, condominium),
+              isThreeLine: true,
+            ),
+          ),
+        ],
       ),
     );
   }
