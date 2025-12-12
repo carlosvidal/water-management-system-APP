@@ -12,12 +12,17 @@ class PeriodsNotifier extends StateNotifier<AsyncValue<List<Period>>> {
 
   Future<void> loadPeriods() async {
     try {
+      print('[PeriodsProvider] Loading periods for condominium: $condominiumId');
       state = const AsyncValue.loading();
       final periodsData = await _apiService.getCondominiumPeriods(condominiumId);
+      print('[PeriodsProvider] Received ${periodsData.length} periods from API');
       final periods = periodsData.map((data) => Period.fromJson(data)).toList();
       periods.sort((a, b) => b.createdAt.compareTo(a.createdAt)); // Sort by newest first
+      print('[PeriodsProvider] Successfully parsed ${periods.length} periods');
       state = AsyncValue.data(periods);
     } catch (error, stackTrace) {
+      print('[PeriodsProvider] ERROR loading periods: $error');
+      print('[PeriodsProvider] Stack trace: $stackTrace');
       state = AsyncValue.error(error, stackTrace);
     }
   }
