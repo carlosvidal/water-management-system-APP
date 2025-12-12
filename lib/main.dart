@@ -63,6 +63,7 @@ class _AquaFlowAppState extends ConsumerState<AquaFlowApp> {
       initialLocation: '/splash',
       redirect: (context, state) {
         final authState = ref.read(authProvider);
+        final authNotifier = ref.read(authProvider.notifier);
         final currentPath = state.fullPath;
 
         // Router navigation logic
@@ -80,6 +81,15 @@ class _AquaFlowAppState extends ConsumerState<AquaFlowApp> {
             // Authenticated user accessing auth page, redirecting to dashboard
             return '/dashboard';
           }
+
+          // Route guards: Check if user has permission for specific routes
+          if (currentPath != null && currentPath.contains('/users')) {
+            // Users management requires SUPER_ADMIN or ADMIN role
+            if (!authNotifier.isSuperAdmin && !authNotifier.isAdmin) {
+              return '/dashboard';
+            }
+          }
+
           // Authenticated user, no redirect needed
           return null; // No redirect needed
         }
