@@ -110,6 +110,41 @@ class ApiService {
     }
   }
 
+  // OTP authentication endpoints
+  Future<Map<String, dynamic>> sendOTP(String phoneNumber) async {
+    if (!await _isConnected()) {
+      throw const ConnectionException('No internet connection');
+    }
+
+    final response = await _dio.post('/auth/otp/send', data: {
+      'phone': phoneNumber,
+    });
+    return response.data;
+  }
+
+  Future<Map<String, dynamic>> verifyOTP(String phoneNumber, String code) async {
+    if (!await _isConnected()) {
+      throw const ConnectionException('No internet connection');
+    }
+
+    final response = await _dio.post('/auth/otp/verify', data: {
+      'phone': phoneNumber,
+      'code': code,
+    });
+    return response.data;
+  }
+
+  Future<Map<String, dynamic>> resendOTP(String phoneNumber) async {
+    if (!await _isConnected()) {
+      throw const ConnectionException('No internet connection');
+    }
+
+    final response = await _dio.post('/auth/otp/resend', data: {
+      'phone': phoneNumber,
+    });
+    return response.data;
+  }
+
   // Condominium endpoints
   Future<List<dynamic>> getCondominiums() async {
     if (!await _isConnected()) {

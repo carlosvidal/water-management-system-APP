@@ -236,7 +236,43 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       ),
                       
                       const SizedBox(height: 16),
-                      
+
+                      // Divider with "OR"
+                      Row(
+                        children: [
+                          const Expanded(child: Divider()),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: Text(
+                              'OR',
+                              style: TextStyle(
+                                color: Colors.grey[600],
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                          const Expanded(child: Divider()),
+                        ],
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      // Phone Login Button
+                      OutlinedButton.icon(
+                        onPressed: () => context.go('/phone-login'),
+                        icon: const Icon(Icons.phone_android),
+                        label: const Text('Sign in with Phone'),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 16),
+
                       // Demo Credentials
                       Container(
                         padding: const EdgeInsets.all(12),

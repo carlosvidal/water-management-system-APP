@@ -171,6 +171,64 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
+  // OTP Authentication Methods
+  Future<void> sendOTP(String phoneNumber) async {
+    try {
+      await _apiService.sendOTP(phoneNumber);
+    } catch (e) {
+      throw Exception('Failed to send OTP: ${e.toString()}');
+    }
+  }
+
+  Future<void> verifyOTP(String phoneNumber, String code) async {
+    try {
+      state = const AuthState.loading();
+
+      final response = await _apiService.verifyOTP(phoneNumber, code);
+
+      final user = User.fromJson(response['user']);
+      final token = response['accessToken'];
+      final refreshToken = response['refreshToken'];
+
+      // Store credentials securely
+      await _secureStorage.storeToken(token);
+      await _secureStorage.storeUserData(jsonEncode(user.toJson()));
+
+      if (refreshToken != null) {
+        await _secureStorage.storeRefreshToken(refreshToken);
+      }
+
+      state = AuthState.authenticated(
+        user: user,
+        token: token,
+        refreshToken: refreshToken,
+      );
+    } catch (e) {
+      String errorMessage = 'OTP verification failed';
+
+      if (e.toString().contains('400')) {
+        errorMessage = 'Invalid OTP code. Please try again.';
+      } else if (e.toString().contains('401')) {
+        errorMessage = 'OTP has expired. Please request a new code.';
+      } else if (e.toString().contains('Too many failed attempts')) {
+        errorMessage = 'Too many failed attempts. Please request a new code.';
+      } else {
+        errorMessage = 'Verification failed: ${e.toString()}';
+      }
+
+      state = AuthState.error(errorMessage);
+      throw Exception(errorMessage);
+    }
+  }
+
+  Future<void> resendOTP(String phoneNumber) async {
+    try {
+      await _apiService.resendOTP(phoneNumber);
+    } catch (e) {
+      throw Exception('Failed to resend OTP: ${e.toString()}');
+    }
+  }
+
   // Helper methods
   bool get isAuthenticated => state.isAuthenticated;
   bool get isLoading => state.isLoading;

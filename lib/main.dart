@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:water_readings_app/core/providers/auth_provider.dart';
 import 'package:water_readings_app/features/auth/login_screen.dart';
+import 'package:water_readings_app/features/auth/phone_login_screen.dart';
 import 'package:water_readings_app/features/onboarding/onboarding_screen.dart';
 import 'package:water_readings_app/shared/widgets/loading_screen.dart';
 import 'package:water_readings_app/features/condominium/condominium_list_screen.dart';
@@ -77,7 +78,7 @@ class _AquaFlowAppState extends ConsumerState<AquaFlowApp> {
         // If user is authenticated
         if (authState.isAuthenticated) {
           // Redirect to main app if trying to access auth pages
-          if (currentPath == '/login' || currentPath == '/onboarding' || currentPath == '/splash') {
+          if (currentPath == '/login' || currentPath == '/phone-login' || currentPath == '/onboarding' || currentPath == '/splash') {
             // Authenticated user accessing auth page, redirecting to dashboard
             return '/dashboard';
           }
@@ -102,7 +103,7 @@ class _AquaFlowAppState extends ConsumerState<AquaFlowApp> {
             return '/login';
           }
           // Allow access to auth pages
-          if (currentPath == '/login' || currentPath == '/onboarding') {
+          if (currentPath == '/login' || currentPath == '/phone-login' || currentPath == '/onboarding') {
             // Unauthenticated user accessing auth page, allowing
             return null;
           }
@@ -125,6 +126,10 @@ class _AquaFlowAppState extends ConsumerState<AquaFlowApp> {
         GoRoute(
           path: '/login',
           builder: (context, state) => const LoginScreen(),
+        ),
+        GoRoute(
+          path: '/phone-login',
+          builder: (context, state) => const PhoneLoginScreen(),
         ),
         GoRoute(
           path: '/dashboard',
