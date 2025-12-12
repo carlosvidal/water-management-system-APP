@@ -57,7 +57,7 @@ class _UnitDetailScreenState extends ConsumerState<UnitDetailScreen> {
     }
     
     // If we still don't have the block name, show the blockId as fallback
-    return _currentUnit.blockId.isNotEmpty ? _currentUnit.blockId : 'N/A';
+    return _currentUnit.blockId?.isNotEmpty == true ? _currentUnit.blockId! : 'N/A';
   }
 
   @override
@@ -119,7 +119,7 @@ class _UnitDetailScreenState extends ConsumerState<UnitDetailScreen> {
             _buildInfoRow(
               Icons.check_circle,
               'Estado',
-              _currentUnit.isActive ? 'Activa' : 'Inactiva',
+              (_currentUnit.isActive ?? true) ? 'Activa' : 'Inactiva',
             ),
           ],
         ),

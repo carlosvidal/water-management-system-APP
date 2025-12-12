@@ -351,8 +351,8 @@ class CondominiumDetailScreen extends ConsumerWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(
-                    unit.isActive ? Icons.check_circle : Icons.cancel,
-                    color: unit.isActive ? Colors.green : Colors.red,
+                    (unit.isActive ?? true) ? Icons.check_circle : Icons.cancel,
+                    color: (unit.isActive ?? true) ? Colors.green : Colors.red,
                   ),
                   const SizedBox(width: 8),
                   const Icon(Icons.arrow_forward_ios, size: 16),
