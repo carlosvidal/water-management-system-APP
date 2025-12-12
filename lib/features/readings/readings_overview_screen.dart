@@ -12,15 +12,7 @@ class ReadingsOverviewScreen extends ConsumerStatefulWidget {
   ConsumerState<ReadingsOverviewScreen> createState() => _ReadingsOverviewScreenState();
 }
 
-class _ReadingsOverviewScreenState extends ConsumerState<ReadingsOverviewScreen> with RouteAware {
-  bool _hasNavigated = false;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    // Reset navigation flag when coming back to this screen
-    _hasNavigated = false;
-  }
+class _ReadingsOverviewScreenState extends ConsumerState<ReadingsOverviewScreen> {
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +37,7 @@ class _ReadingsOverviewScreenState extends ConsumerState<ReadingsOverviewScreen>
       return _buildEmptyState(context);
     }
 
-    // If user has only one condominium, navigate directly to it
+    // If user has only one condominium, show the card to navigate to periods
     if (condominiums.length == 1) {
       final condominium = condominiums.first;
       final totalUnits = _getTotalUnits(condominium);
@@ -55,19 +47,7 @@ class _ReadingsOverviewScreenState extends ConsumerState<ReadingsOverviewScreen>
         return _buildCondominiumNotReadyState(context, condominium);
       }
 
-      // Navigate directly to the single condominium's periods (only once)
-      if (!_hasNavigated) {
-        _hasNavigated = true;
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          _navigateToCondominiumPeriods(context, condominium);
-        });
-
-        // Show loading while navigating
-        return const Center(child: CircularProgressIndicator());
-      }
-
-      // If we've already navigated, show the selection screen
-      // This prevents infinite navigation loop when user presses back
+      // Show the selection screen instead of auto-navigating
       return _buildSingleCondominiumView(context, condominium);
     }
 
