@@ -76,9 +76,9 @@ Map<String, dynamic> _$BlockToJson(Block instance) => <String, dynamic>{
 Unit _$UnitFromJson(Map<String, dynamic> json) => Unit(
   id: json['id'] as String,
   name: json['name'] as String,
-  blockId: json['blockId'] as String,
+  blockId: json['blockId'] as String?,
   residentId: json['residentId'] as String?,
-  isActive: json['isActive'] as bool,
+  isActive: json['isActive'] as bool?,
   block:
       json['block'] == null
           ? null

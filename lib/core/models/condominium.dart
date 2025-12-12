@@ -134,22 +134,22 @@ class Block {
 class Unit {
   final String id;
   final String name;
-  final String blockId;
+  final String? blockId;
   final String? residentId;
-  final bool isActive;
+  final bool? isActive;
   final Block? block;
   final Resident? resident;
   final List<Resident>? residents;
   final List<Meter>? meters;
   final DateTime? createdAt;
   final DateTime? updatedAt;
-  
+
   const Unit({
     required this.id,
     required this.name,
-    required this.blockId,
+    this.blockId,
     this.residentId,
-    required this.isActive,
+    this.isActive,
     this.block,
     this.resident,
     this.residents,
