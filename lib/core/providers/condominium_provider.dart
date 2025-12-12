@@ -15,7 +15,14 @@ class CondominiumNotifier extends StateNotifier<AsyncValue<List<Condominium>>> {
   Future<void> loadCondominiums() async {
     try {
       state = const AsyncValue.loading();
+      print('[CondominiumProvider] Loading condominiums...');
+
       final condominiumsData = await _apiService.getCondominiums();
+      print('[CondominiumProvider] Received ${condominiumsData.length} condominiums from API');
+
+      if (condominiumsData.isNotEmpty) {
+        print('[CondominiumProvider] First condominium sample: ${condominiumsData.first}');
+      }
 
       // Check if the first condominium has blocks data or just _count
       final needsDetailedFetch = condominiumsData.isNotEmpty &&
@@ -23,30 +30,46 @@ class CondominiumNotifier extends StateNotifier<AsyncValue<List<Condominium>>> {
           (condominiumsData.first as Map)['blocks'] == null &&
           (condominiumsData.first as Map)['_count'] != null;
 
+      print('[CondominiumProvider] Needs detailed fetch: $needsDetailedFetch');
+
       List<Condominium> condominiums;
 
       if (needsDetailedFetch) {
+        print('[CondominiumProvider] Fetching detailed data for each condominium...');
         // Fetch complete data for each condominium
         final detailedData = await Future.wait(
           condominiumsData.map((data) => _apiService.getCondominium(data['id'] as String))
         );
+        print('[CondominiumProvider] Converting detailed data to models...');
         condominiums = detailedData.map((data) => Condominium.fromJson(data)).toList();
       } else {
+        print('[CondominiumProvider] Converting data to models...');
         condominiums = condominiumsData
-            .map((data) => Condominium.fromJson(data as Map<String, dynamic>))
+            .map((data) {
+              print('[CondominiumProvider] Parsing condominium: ${data['id']}');
+              try {
+                return Condominium.fromJson(data as Map<String, dynamic>);
+              } catch (e) {
+                print('[CondominiumProvider] ERROR parsing condominium ${data['id']}: $e');
+                print('[CondominiumProvider] Problematic data: $data');
+                rethrow;
+              }
+            })
             .toList();
       }
 
+      print('[CondominiumProvider] Successfully parsed ${condominiums.length} condominiums');
       state = AsyncValue.data(condominiums);
     } catch (e, stackTrace) {
-      // Error loading condominiums
+      print('[CondominiumProvider] ERROR loading condominiums: $e');
+      print('[CondominiumProvider] Stack trace: $stackTrace');
 
       // Check if it's an authentication error
       if (e is DioException) {
         if (e.response?.statusCode == 401 ||
             (e.response?.statusCode == 500 &&
              e.response?.data?['details']?['stack']?.contains('Invalid access token') == true)) {
-          // Authentication error detected, logging out user
+          print('[CondominiumProvider] Authentication error detected, logging out user');
           // Force logout on authentication errors
           _ref.read(authProvider.notifier).logout();
           return;
