@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:water_readings_app/core/providers/auth_provider.dart';
 import 'package:water_readings_app/core/services/api_service.dart';
-import 'package:water_readings_app/shared/widgets/main_layout.dart';
 
 class UsersListScreen extends ConsumerStatefulWidget {
   final String condominiumId;
@@ -113,28 +112,25 @@ class _UsersListScreenState extends ConsumerState<UsersListScreen> {
     final authNotifier = ref.read(authProvider.notifier);
     final canManageUsers = authNotifier.isSuperAdmin || authNotifier.isAdmin;
 
-    return MainLayout(
-      currentIndex: -1,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Gestión de Usuarios'),
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () => context.pop(),
-          ),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Gestión de Usuarios'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.pop(),
         ),
-        body: RefreshIndicator(
-          onRefresh: _loadUsers,
-          child: _buildBody(canManageUsers),
-        ),
-        floatingActionButton: canManageUsers
-            ? FloatingActionButton.extended(
-                onPressed: _showCreateUserDialog,
-                icon: const Icon(Icons.person_add),
-                label: const Text('Nuevo Usuario'),
-              )
-            : null,
       ),
+      body: RefreshIndicator(
+        onRefresh: _loadUsers,
+        child: _buildBody(canManageUsers),
+      ),
+      floatingActionButton: canManageUsers
+          ? FloatingActionButton.extended(
+              onPressed: _showCreateUserDialog,
+              icon: const Icon(Icons.person_add),
+              label: const Text('Nuevo Usuario'),
+            )
+          : null,
     );
   }
 
