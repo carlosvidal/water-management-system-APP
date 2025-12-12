@@ -15,7 +15,7 @@ Condominium _$CondominiumFromJson(Map<String, dynamic> json) => Condominium(
   readingDay: (json['readingDay'] as num?)?.toInt(),
   bankAccount: json['bankAccount'] as String?,
   bankAccountHolder: json['bankAccountHolder'] as String?,
-  planId: json['planId'] as String,
+  planId: json['planId'] as String?,
   totalUnitsPlanned: (json['totalUnitsPlanned'] as num?)?.toInt(),
   isActive: json['isActive'] as bool,
   createdAt: DateTime.parse(json['createdAt'] as String),

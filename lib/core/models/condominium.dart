@@ -12,7 +12,7 @@ class Condominium {
   final int? readingDay;
   final String? bankAccount;
   final String? bankAccountHolder;
-  final String planId;
+  final String? planId;
   final int? totalUnitsPlanned;
   final bool isActive;
   final DateTime createdAt;
@@ -29,7 +29,7 @@ class Condominium {
     this.readingDay,
     this.bankAccount,
     this.bankAccountHolder,
-    required this.planId,
+    this.planId,
     this.totalUnitsPlanned,
     required this.isActive,
     required this.createdAt,
