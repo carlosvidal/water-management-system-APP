@@ -43,6 +43,11 @@ class _OTPVerificationScreenState extends ConsumerState<OTPVerificationScreen> {
     _timer?.cancel();
     _remainingSeconds = 600; // 10 minutes
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
+
       if (_remainingSeconds > 0) {
         setState(() {
           _remainingSeconds--;
@@ -370,16 +375,20 @@ class _OTPVerificationScreenState extends ConsumerState<OTPVerificationScreen> {
     if (_formKey.currentState?.validate() != true) return;
 
     if (_remainingSeconds <= 0) {
-      setState(() {
-        _errorMessage = 'OTP has expired. Please request a new code.';
-      });
+      if (mounted) {
+        setState(() {
+          _errorMessage = 'OTP has expired. Please request a new code.';
+        });
+      }
       return;
     }
 
-    setState(() {
-      _isLoading = true;
-      _errorMessage = null;
-    });
+    if (mounted) {
+      setState(() {
+        _isLoading = true;
+        _errorMessage = null;
+      });
+    }
 
     try {
       final code = _otpController.text.trim();
@@ -392,9 +401,11 @@ class _OTPVerificationScreenState extends ConsumerState<OTPVerificationScreen> {
 
       // Navigation will be handled by the auth state listener
     } catch (e) {
-      setState(() {
-        _errorMessage = e.toString().replaceAll('Exception: ', '');
-      });
+      if (mounted) {
+        setState(() {
+          _errorMessage = e.toString().replaceAll('Exception: ', '');
+        });
+      }
     } finally {
       if (mounted) {
         setState(() {
@@ -405,10 +416,12 @@ class _OTPVerificationScreenState extends ConsumerState<OTPVerificationScreen> {
   }
 
   Future<void> _handleResendOTP() async {
-    setState(() {
-      _isResending = true;
-      _errorMessage = null;
-    });
+    if (mounted) {
+      setState(() {
+        _isResending = true;
+        _errorMessage = null;
+      });
+    }
 
     try {
       await ref.read(authProvider.notifier).resendOTP(widget.phoneNumber);
@@ -425,9 +438,11 @@ class _OTPVerificationScreenState extends ConsumerState<OTPVerificationScreen> {
         );
       }
     } catch (e) {
-      setState(() {
-        _errorMessage = e.toString().replaceAll('Exception: ', '');
-      });
+      if (mounted) {
+        setState(() {
+          _errorMessage = e.toString().replaceAll('Exception: ', '');
+        });
+      }
     } finally {
       if (mounted) {
         setState(() {
