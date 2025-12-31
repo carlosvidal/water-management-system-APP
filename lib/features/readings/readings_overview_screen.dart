@@ -57,23 +57,6 @@ class _ReadingsOverviewScreenState extends ConsumerState<ReadingsOverviewScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header
-          Text(
-            'Gestión de Lecturas',
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Selecciona un condominio para gestionar sus lecturas',
-            style: TextStyle(
-              color: Colors.grey[600],
-            ),
-          ),
-          
-          const SizedBox(height: 24),
-
           // Condominiums List for Readings
           ...condominiums.map((condominium) => Card(
             margin: const EdgeInsets.only(bottom: 12),
@@ -255,23 +238,6 @@ class _ReadingsOverviewScreenState extends ConsumerState<ReadingsOverviewScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header
-          Text(
-            'Gestión de Lecturas',
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Tu condominio',
-            style: TextStyle(
-              color: Colors.grey[600],
-            ),
-          ),
-
-          const SizedBox(height: 24),
-
           // Single Condominium Card
           Card(
             margin: const EdgeInsets.only(bottom: 12),

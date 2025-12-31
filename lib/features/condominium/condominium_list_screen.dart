@@ -30,6 +30,15 @@ class CondominiumListScreen extends ConsumerWidget {
     );
   }
 
+  int _getTotalUnits(Condominium condominium) {
+    if (condominium.blocks == null) return 0;
+    int total = 0;
+    for (var block in condominium.blocks!) {
+      total += block.units?.length ?? 0;
+    }
+    return total;
+  }
+
   Widget _buildCondominiumsList(BuildContext context, List<Condominium> condominiums) {
     if (condominiums.isEmpty) {
       return const Center(
@@ -88,14 +97,30 @@ class CondominiumListScreen extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(condominium.address),
-                if (condominium.city != null)
-                  Text(
-                    condominium.city!,
-                    style: TextStyle(
-                      color: Colors.grey[600],
-                      fontSize: 12,
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    Icon(Icons.domain, size: 14, color: Colors.grey[600]),
+                    const SizedBox(width: 4),
+                    Text(
+                      '${condominium.blocks?.length ?? 0} bloques',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey[600],
+                      ),
                     ),
-                  ),
+                    const SizedBox(width: 12),
+                    Icon(Icons.home, size: 14, color: Colors.grey[600]),
+                    const SizedBox(width: 4),
+                    Text(
+                      '${_getTotalUnits(condominium)} unidades',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
             trailing: Icon(
@@ -104,7 +129,7 @@ class CondominiumListScreen extends ConsumerWidget {
               color: Colors.grey[400],
             ),
             onTap: () => context.go('/condominium/${condominium.id}'),
-            isThreeLine: condominium.city != null,
+            isThreeLine: true,
           ),
         );
       },
